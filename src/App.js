@@ -1,25 +1,63 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import moment from "moment";
+import AddForm from "./components/AddForm";
+import WatchList from "./components/WatchList";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      watches: [],
+      currentUTC: null
+    };
+  }
+
+  componentDidMount() {
+    this.loadTime();
+  }
+
+  loadTime = () => {
+    setInterval(() => {
+      this.setState({
+        currentUTC: moment().utc()
+      });
+    }, 1000);
+  };
+
+  handleAdd = watch => {
+    this.setState(prevState => ({
+      watches: [...prevState.watches, watch]
+    }));
+  };
+
+  handleDelete = id => {
+    this.setState(prevState => ({
+      watches: prevState.watches.filter(watch => watch.id !== id)
+    }));
+  };
+
+  componentWillUnmount() {
+    clearInterval(this.loadTime);
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <div className="ui container segment">
+          <AddForm handleAdd={this.handleAdd} />
+          <WatchList
+            watches={this.state.watches}
+            currentUTC={this.state.currentUTC}
+            handleDelete={this.handleDelete}
+          />
+        </div>
+        <p>learn react</p>
+      </div>
+    );
+  }
 }
 
 export default App;
+
